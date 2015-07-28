@@ -1,0 +1,15 @@
+
+- Analizar estructura para hacer el código ordenado y coherente (donde va cada cosa)
+- Crear modelo de contenidos y taxonomías
+	- Crear forma de implementar taxonomías a distintos tipos de contenido independientemente de cuales hayan.
+- Crear importador de CSV con estructura predefinida
+- Crear poblador de contenidos
+- Crear interfaz / procesador de párrafos al interior de unidades de contenido
+	- Asignar ID - URL a cada sub-sector de contenido
+- Añadir metadatos al sistema de comentarios de WP para permitir comentarios en secciones específicas del contenido
+- Crear shortcode para citar fragmentos de contenido de constitución
+- Crear iframe embebible para sitios externos con fragmentos de constitución
+	- Definir librerías de javascript a utilizar
+		- popups
+		- selección de texto
+
