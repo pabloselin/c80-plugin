@@ -3,6 +3,8 @@
 - Crear modelo de contenidos y taxonomías
 	- Crear forma de implementar taxonomías a distintos tipos de contenido independientemente de cuales hayan.
 - Crear importador de CSV con estructura predefinida
+	- Crear página de administrador para importar el CSV
+	- Crear función de procesado de contenidos
 - Crear poblador de contenidos
 - Crear interfaz / procesador de párrafos al interior de unidades de contenido
 	- Asignar ID - URL a cada sub-sector de contenido

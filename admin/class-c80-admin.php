@@ -100,4 +100,66 @@ class c80_Admin {
 
 	}
 
+	public function main_admin_menu() {
+		add_menu_page( 
+			__('Opciones C80', 'c80'), 
+			__('Configuración C80', 'c80') ,
+			'manage_options',
+			plugin_dir_url(__FILE__) . 'partials/c80-admin-display.php',
+			'',
+			'dashicons-book-alt',
+			20
+			);
+	}
+
+	// Register Custom Post Type
+	public function custom_content() {
+
+			$labels = array(
+				'name'                => _x( 'Artículos', 'Post Type General Name', 'c80' ),
+				'singular_name'       => _x( 'Artículo', 'Post Type Singular Name', 'c80' ),
+				'menu_name'           => __( 'Constitución 1980', 'c80' ),
+				'name_admin_bar'      => __( 'Constitución 1980', 'c80' ),
+				'parent_item_colon'   => __( 'Artículo superior', 'c80' ),
+				'all_items'           => __( 'Todos los artículos', 'c80' ),
+				'add_new_item'        => __( 'Añadir nuevo artículo', 'c80' ),
+				'add_new'             => __( 'Añadir nuevo', 'c80' ),
+				'new_item'            => __( 'Nuevo artículo', 'c80' ),
+				'edit_item'           => __( 'Editar artículo', 'c80' ),
+				'update_item'         => __( 'Actualizar artículo', 'c80' ),
+				'view_item'           => __( 'Ver artículo', 'c80' ),
+				'search_items'        => __( 'Buscar artículo', 'c80' ),
+				'not_found'           => __( 'No encontrado', 'c80' ),
+				'not_found_in_trash'  => __( 'No encontrado en Papelera', 'c80' ),
+			);
+			$rewrite = array(
+				'slug'                => 'articulo',
+				'with_front'          => true,
+				'pages'               => true,
+				'feeds'               => true,
+			);
+			$args = array(
+				'label'               => __( 'Artículo', 'c80' ),
+				'description'         => __( 'Constitución de 1980', 'c80' ),
+				'labels'              => $labels,
+				'supports'            => array( 'title', 'editor', 'excerpt', 'comments', 'trackbacks', 'revisions', 'custom-fields', 'page-attributes', ),
+				'taxonomies'          => array( 'category', 'post_tag' ),
+				'hierarchical'        => true,
+				'public'              => true,
+				'show_ui'             => true,
+				'show_in_menu'        => true,
+				'menu_position'       => 5,
+				'menu_icon'           => 'dashicons-book-alt',
+				'show_in_admin_bar'   => true,
+				'show_in_nav_menus'   => true,
+				'can_export'          => true,
+				'has_archive'         => true,		
+				'exclude_from_search' => false,
+				'publicly_queryable'  => true,
+				'rewrite'             => $rewrite,
+				'capability_type'     => 'page',
+			);
+			register_post_type( 'c80_cpt', $args );
+
+		}
 }
