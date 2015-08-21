@@ -98,19 +98,106 @@ class c80_Admin {
 
 		wp_enqueue_script( $this->c80, plugin_dir_url( __FILE__ ) . 'js/c80-admin.js', array( 'jquery' ), $this->version, false );
 
+		$screen = get_current_screen();
+		if( 'page' == $screen->id ) {
+			add_thickbox();
+			wp_enqueue_script( 'media-upload' );
+			wp_enqueue_style( 'media-upload' );
+		}
+
 	}
 
-	public function main_admin_menu() {
-		add_menu_page( 
-			__('Opciones C80', 'c80'), 
-			__('Configuración C80', 'c80') ,
+	public function admin_menu() {
+		add_options_page(
+			apply_filters( $this->c80 . '-settings-page-title', 'Ajustes C80' ),
+			apply_filters( $this->c80 . '-settings-menu-title', 'C 80' ),
 			'manage_options',
-			plugin_dir_url(__FILE__) . 'partials/c80-admin-display.php',
-			'',
-			'dashicons-book-alt',
-			20
+			$this->c80,
+			array( $this, 'opciones' )
 			);
 	}
+
+	public function opciones() {
+		// Muestra la página de opciones del plugin
+		echo  '<h2>'. esc_html( get_admin_page_title() ) .'</h2>';
+
+		?>
+			<form method="post" action="options.php">
+				<?php
+					settings_fields( 'c80-options' );
+					do_settings_sections( $this->c80 );
+					submit_button( 'Guardar' );
+				?>
+			</form>
+		<?php
+	}
+
+	public function register_settings() {
+		// Registra los ajustes del plugin y genera los campos
+
+		// register_setting( $option_group, $option_name, $sanitize_callback );
+		register_setting(
+			$this->c80 . '-options',
+			$this->c80 . '-options',
+			array( $this, 'validate_options')
+			);
+
+		// add_settings_section( $id, $title, $callback, $menu_slug );
+
+		add_settings_section(
+			$this->c80 . '-import-csv',
+			apply_filters( $this->c80 . '-import-section-title', 'Importar' ),
+			array( $this, 'import_section' ),
+			$this->c80
+			);
+
+		// add_settings_field( $id, $title, $callback, $menu_slug, $section, $args );
+
+		add_settings_field(
+			'import-file',
+			apply_filters($this->c80 . '-import-file-label', 'Importar archivo (.csv)'),
+			array($this, 'import_csv_field'),
+			$this->c80,
+			$this->c80 . '-import-csv');
+			
+	}
+
+	public function validate_options( $input ) {
+		$valid = array();
+		if( isset( $input['import-file'] ) ) {
+
+		}
+		return $valid;
+	}
+
+
+	//Muestra la sección
+	public function import_section( $params ) {
+		echo '<p>'.$params['title'].'</p>';
+	}
+
+	public function import_csv_field() {
+		$options = get_option( $this->c80 . '-options');
+		$option = 0;
+		if( ! empty ( $options['import-file']) ) {
+			$option = $options['import-file'];
+		}
+			
+			$html = '<input type="text" name="' . $this->c80 . '-options[import-file]" value="' . esc_url($option) . '" placeholder="No hay archivos subidos">';
+			$html .= '<input id="upload_csv" type="button" name="upload_csv" class="button" value="Subir archivo CSV">';
+			$html .= '<span class="description">Subir un archivo CSV para procesar sus contenidos</span>';
+			echo $html;
+	}
+
+	public function text_url_field() {
+			$options = get_option( $this->c80 . '-options');
+			$option = 0;
+			if( ! empty ( $options['text-file']) ) {
+				$option = $options['text-file'];
+			}
+			$html =	'<input type="text" id="' . $this->c80 . '-options[import-file]" name="' . $this->c80 . '-options[import-file]" value="' . $options['text-file'] .'"></input>';
+	}
+
 
 	// Register Custom Post Type
 	public function custom_content() {

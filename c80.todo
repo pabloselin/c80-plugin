@@ -1,10 +1,12 @@
 
-- Analizar estructura para hacer el código ordenado y coherente (donde va cada cosa)
-- Crear modelo de contenidos y taxonomías
++- Analizar estructura para hacer el código ordenado y coherente (donde va cada cosa)
+-- Crear modelo de contenidos y taxonomías
 	- Crear forma de implementar taxonomías a distintos tipos de contenido independientemente de cuales hayan.
 - Crear importador de CSV con estructura predefinida
 	- Crear página de administrador para importar el CSV
 	- Crear función de procesado de contenidos
+		-- Crear función en AJAX que vaya mostrando el progreso de la importación
+		-- Crear función para asignado de posts
 - Crear poblador de contenidos
 - Crear interfaz / procesador de párrafos al interior de unidades de contenido
 	- Asignar ID - URL a cada sub-sector de contenido
@@ -14,4 +16,7 @@
 	- Definir librerías de javascript a utilizar
 		- popups
 		- selección de texto
+
+
+- Estructura JSON exportable
 
