@@ -100,6 +100,145 @@ class c80_Public {
 
 	}
 
-	
+	/**
+	 * Replaces classic content with special custom fields by paragraph
+	 *
+	 * @since    1.0.0
+	 */
+	public function c80_content( $content ) {
+		
+		global $post;
+		
+		$post_type = get_post_type( $post );
+		
+		if($post_type == 'c80_cpt' && class_exists('RW_Meta_Box')) {
+		
+			if(rwmb_meta( 'c80_parrafo', $post->ID )) {
+		
+				//Reemplazo la variable de contenido
+		
+				$content = '';
+				
+		
+				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $post->ID );
+		
+				//var_dump($parrafos);
+				
+				foreach(  $parrafos[0] as $key=>$parrafo ) {
 
+					$extraclasses = '';
+					
+					$relids = $this->c80_relp( $this->c80_pid( $key, $post->ID ) );
+					
+					if($relids != 0) {
+						$relids = implode($relids, ', ');
+						$relids = ' data-relids="'. $relids . '"';
+						$extraclasses = 'con-rel';
+					} else {
+						$relids = '';
+					}
+					//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
+					//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
+
+					$content .= '<a class="c80_p ' . $extraclasses . '" href="#" name="'. $this->c80_permalink($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '"><p>' . $parrafo . '</p></a>'. $this->c80_afterp( $post->ID, $key );
+				}
+		
+			}
+		
+		}
+		
+		return $content;
+	}
+
+	/**
+	 * Generates paragraph permalink
+	 *
+	 * @since    1.0.0
+	 */	
+	public function c80_permalink( $postid, $key ) {
+		return get_permalink($postid) . '#parrafo-' . $key;
+	}
+
+	/**
+	 * Generates utilites after paragraph 
+	 *
+	 * @since    1.0.0
+	 */
+	public function c80_afterp( $postid, $key ) {
+		
+		$html = '<p class="afterp">';
+		
+		$html .= '<a href="#comment">Comentar</a> | <a href="#compartir">Compartir</a> | <a href="#citar">Citar</a> | <a href="' . $this->c80_permalink($postid, $key) . '">Permalink</a>';
+		
+		$html .= '</p>';
+
+		return $html;
+	}
+
+	/**
+	 * Generates paragraph ID
+	 *
+	 * @since    1.0.0
+	 */
+	public function c80_pid( $key, $postid ) {
+		return $key . '-' . $postid;
+	}
+
+	/**
+	 * Fetches paragraph-related content
+	 * Returns an array of related IDs or 0 in empty cases
+	 *
+	 * @since    1.0.0
+	 */
+	public function c80_relp( $parid ) {
+		$args = array(
+			'post_type' => 'any',
+			'numberposts' => 100,
+			'meta_query' => array(
+				array(
+					'key' => 'c80_parraforel',
+					'value' => $parid
+					)
+				)
+			);
+		$prels = get_posts($args);
+		if($prels) {
+			$prelids = array();
+			foreach($prels as $prel) {
+				$prelids[] = $prel->ID;
+			}
+			return $prelids;	
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * Fetches article-related content
+	 * Returns an array of related IDs or 0 in empty cases
+	 *
+	 * @since    1.0.0
+	 */
+	public function c80_relart( $artid ) {
+		$args = array(
+			'post_type' => 'any',
+			'numberposts' => 100,
+			'meta_query' => array(
+				array(
+					'key' => 'c80_artrel',
+					'value' => $artid
+					)
+				)
+			);
+		$artrels = get_posts($args);
+		if($artrels) {
+			$artids = array();
+			foreach($artrels as $artrel) {
+				$artids[] = $artrel->ID;
+			}
+			return $artids;
+		} else {
+			return 0;
+		}
+	}
 }

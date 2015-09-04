@@ -157,7 +157,10 @@ class c80 {
 		$this->loader->add_action( 'init', $plugin_admin, 'custom_content');
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu');
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
-
+		
+		if(class_exists( 'RW_Meta_Box' ) ) {
+			$this->loader->add_filter( 'rwmb_meta_boxes', $plugin_admin, 'create_metaboxes' );		
+		}
 	}
 
 	/**
@@ -173,6 +176,9 @@ class c80 {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		if(class_exists( 'RW_Meta_Box' ) ) {
+			$this->loader->add_filter( 'the_content', $plugin_public, 'c80_content');
+		}
 	}
 
 	/**

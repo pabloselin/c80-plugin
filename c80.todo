@@ -8,8 +8,8 @@
 		-- Crear función en AJAX que vaya mostrando el progreso de la importación
 		-- Crear función para asignado de posts
 - Crear poblador de contenidos
-- Crear interfaz / procesador de párrafos al interior de unidades de contenido
-	- Asignar ID - URL a cada sub-sector de contenido
++- Crear interfaz / procesador de párrafos al interior de unidades de contenido
+	+- Asignar ID - URL a cada sub-sector de contenido
 - Añadir metadatos al sistema de comentarios de WP para permitir comentarios en secciones específicas del contenido
 - Crear shortcode para citar fragmentos de contenido de constitución
 - Crear iframe embebible para sitios externos con fragmentos de constitución
@@ -19,4 +19,4 @@
 
 
 - Estructura JSON exportable
-
+- Visualización - RVega

@@ -220,7 +220,7 @@ class c80_Admin {
 				'not_found_in_trash'  => __( 'No encontrado en Papelera', 'c80' ),
 			);
 			$rewrite = array(
-				'slug'                => 'articulo',
+				'slug'                => 'constitucion',
 				'with_front'          => true,
 				'pages'               => true,
 				'feeds'               => true,
@@ -229,7 +229,7 @@ class c80_Admin {
 				'label'               => __( 'Artículo', 'c80' ),
 				'description'         => __( 'Constitución de 1980', 'c80' ),
 				'labels'              => $labels,
-				'supports'            => array( 'title', 'editor', 'excerpt', 'comments', 'trackbacks', 'revisions', 'custom-fields', 'page-attributes', ),
+				'supports'            => array( 'title', 'excerpt', 'comments', 'trackbacks', 'revisions', 'custom-fields', 'page-attributes', ),
 				'taxonomies'          => array( 'category', 'post_tag' ),
 				'hierarchical'        => true,
 				'public'              => true,
@@ -248,5 +248,115 @@ class c80_Admin {
 			);
 			register_post_type( 'c80_cpt', $args );
 
+		}
+
+	public function custom_taxs() {
+
+	}
+
+	public function create_metaboxes( $meta_boxes ) {
+			
+			if(array_key_exists('post', $_GET)) {
+				$postid = $_GET['post'];	
+			}
+			
+			$prefix = $this->c80;
+
+			//Subtítulo para capítulos y usos eventuales
+			$meta_boxes[] = array(
+				'id'=> 'subtitulo_artcap',
+				'title' => 'Subtítulo',
+				'pages' => array('c80_cpt'),
+				'context' => 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Subtítulo',
+						'desc' => 'Subtítulo utilizado también para el nombre de los capítulos',
+						'id' => $prefix . '_subtartcap',
+						'type' => 'text'
+						)
+					)
+				);
+
+
+			//párrafos artículo
+			$meta_boxes[] = array(
+				'id' => 'parrafo_articulo',
+				'title' => 'Contenidos Artículo (por párrafo)',
+				'pages' => array('c80_cpt'),
+				'context'=> 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Párrafo',
+						'desc' => 'Párrafos del artículo',
+						'id' => $prefix . '_parrafo',
+						'type' => 'textarea',
+						'clone' => true
+						)
+					)
+				);
+
+			
+			$args = array(
+				'post_type' => 'c80_cpt',
+				'numberposts' => -1
+				);
+			$prearticulos = get_posts($args);
+			foreach($prearticulos as $prearticulo) {
+				$articulos[$prearticulo->ID] = $prearticulo->post_title;
+			}
+
+			if( isset($postid) && get_post_meta($postid, 'c80_artrel') ) {
+				
+				$parrafos_articulo = get_post_meta( $postid, 'c80_artrel', true );
+				
+				$parrafos_contenidos = rwmb_meta('c80_parrafo', 'multiple=true', $parrafos_articulo);
+					
+				foreach($parrafos_contenidos[0] as $key=>$parrafo_contenido) {
+					
+					$extracto_parrafo = substr($parrafo_contenido, 0, 40) . '&hellip;';
+					$contador = $key + 1;
+					$parrafos[$key . '-' . $parrafos_articulo] = 'Párrafo ' . $contador . ': ' . $extracto_parrafo;
+				}	
+				
+			} else {
+				$parrafos = array( '0' => 'Escoge un artículo relacionado y guarda el contenido para poder ver los párrafos disponibles');
+			}
+			
+
+
+			//Relaciones
+			$meta_boxes[] = array(
+				'id' => 'articulo_relacionado',
+				'title' => 'Artículo de la Constitución Relacionado',
+				'pages' => array('post'),
+				'context' => 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Artículo a relacionar',
+						'desc' => 'Artículo de la Constitución que se relaciona con este contenido.',
+						'id' => $prefix . '_artrel',
+						'type' => 'select',
+						'options' => $articulos,
+						'placeholder' => 'Escoge un artículo...',
+						'multiple' => false
+						),
+					array(
+						'name' => 'Párrafo del artículo',
+						'desc' => 'Párrafo del artículo a relacionar, se puede seleccionar una vez escogido el artículo y guardado el contenido. Se pueden relacionar varios párrafos con la tecla Ctrl o Cmd, no es necesario tener un párrafo relacionado.',
+						'id' => $prefix . '_parraforel',
+						'type' => 'select',
+						'options' => $parrafos,
+						'placeholder' => 'Escoge un párrafo ...',
+						'multiple' => true
+						)
+					)
+
+				);
+
+			return $meta_boxes;
 		}
 }
