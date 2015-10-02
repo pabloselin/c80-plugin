@@ -301,11 +301,15 @@ class c80_Admin {
 			
 			$args = array(
 				'post_type' => 'c80_cpt',
-				'numberposts' => -1
+				'numberposts' => -1,
+				'order_by' => 'menu_order',
+				'order' => 'ASC'
 				);
 			$prearticulos = get_posts($args);
 			foreach($prearticulos as $prearticulo) {
-				$articulos[$prearticulo->ID] = $prearticulo->post_title;
+				if($prearticulo->post_parent != 0) {
+					$articulos[$prearticulo->ID] = $prearticulo->post_title;	
+				}
 			}
 
 			if( isset($postid) && get_post_meta($postid, 'c80_artrel') ) {
@@ -331,7 +335,7 @@ class c80_Admin {
 			$meta_boxes[] = array(
 				'id' => 'articulo_relacionado',
 				'title' => 'Artículo de la Constitución Relacionado',
-				'pages' => array('post'),
+				'pages' => array('post', 'columnas'),
 				'context' => 'normal',
 				'priority' => 'high',
 				'fields' => array(
@@ -341,18 +345,19 @@ class c80_Admin {
 						'id' => $prefix . '_artrel',
 						'type' => 'select',
 						'options' => $articulos,
-						'placeholder' => 'Escoge un artículo...',
-						'multiple' => false
-						),
-					array(
-						'name' => 'Párrafo del artículo',
-						'desc' => 'Párrafo del artículo a relacionar, se puede seleccionar una vez escogido el artículo y guardado el contenido. Se pueden relacionar varios párrafos con la tecla Ctrl o Cmd, no es necesario tener un párrafo relacionado.',
-						'id' => $prefix . '_parraforel',
-						'type' => 'select',
-						'options' => $parrafos,
-						'placeholder' => 'Escoge un párrafo ...',
+						'placeholder' => 'Escoge uno o más artículos relacionados...',
 						'multiple' => true
 						)
+					// Desactivado momentáneamente
+					// array(
+					// 	'name' => 'Párrafo del artículo',
+					// 	'desc' => 'Párrafo del artículo a relacionar, se puede seleccionar una vez escogido el artículo y guardado el contenido. Se pueden relacionar varios párrafos con la tecla Ctrl o Cmd, no es necesario tener un párrafo relacionado.',
+					// 	'id' => $prefix . '_parraforel',
+					// 	'type' => 'select',
+					// 	'options' => $parrafos,
+					// 	'placeholder' => 'Escoge un párrafo ...',
+					// 	'multiple' => true
+					// 	)
 					)
 
 				);
