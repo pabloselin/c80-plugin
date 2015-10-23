@@ -203,8 +203,8 @@ class c80_Admin {
 	public function custom_content() {
 
 			$labels = array(
-				'name'                => _x( 'Artículos', 'Post Type General Name', 'c80' ),
-				'singular_name'       => _x( 'Artículo', 'Post Type Singular Name', 'c80' ),
+				'name'                => _x( 'Artículos Constitución', 'Post Type General Name', 'c80' ),
+				'singular_name'       => _x( 'Artículo Constitución', 'Post Type Singular Name', 'c80' ),
 				'menu_name'           => __( 'Constitución 1980', 'c80' ),
 				'name_admin_bar'      => __( 'Constitución 1980', 'c80' ),
 				'parent_item_colon'   => __( 'Artículo superior', 'c80' ),
