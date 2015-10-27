@@ -29,4 +29,12 @@
 	 * be doing this, we should try to minimize doing that in our own work.
 	 */
 
+	 var hash = window.location.hash;
+	 $( window ).load(function() {
+	 	console.log(hash);
+	 	if(hash.length > 0) {
+	 		$('a' + hash).addClass('highlight');	
+	 	}
+	 });
+
 })( jQuery );

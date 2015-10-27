@@ -140,7 +140,7 @@ class c80_Public {
 					//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
 					//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
 
-					$content .= '<a class="c80_p ' . $extraclasses . '" href="#" name="'. $this->c80_permalink($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '"><p>' . $parrafo . '</p></a>'. $this->c80_afterp( $post->ID, $key );
+					$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($post->ID, $key) .'" name="'. $this->c80_name($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($post->ID, $key) . '"><p>' . $parrafo . '</p></a>'. $this->c80_afterp( $post->ID, $key );
 				}
 		
 			}
@@ -151,12 +151,37 @@ class c80_Public {
 	}
 
 	/**
-	 * Generates paragraph permalink
+	 * Generates paragraph permalink in article
 	 *
 	 * @since    1.0.0
 	 */	
 	public function c80_permalink( $postid, $key ) {
-		return get_permalink($postid) . '#parrafo-' . $key;
+		return get_permalink($postid) . '#parrafo-' . $this->c80_pid($key, $postid);
+	}
+
+	/**
+	 * Generates paragraph permalink in capitulo
+	 *
+	 * @since    1.0.0
+	 */	
+	public function c80_permalink_chapter( $postid, $key ) {
+		$parents = get_post_ancestors( $postid );
+		if($parents) {
+			$parents = array_reverse($parents);
+			$tops = $parents[0];
+			return get_permalink($tops) . '#parrafo-' . $this->c80_pid($key, $postid);
+		}
+	}
+
+
+
+	/**
+	 * Generates paragraph name
+	 *
+	 * @since    1.0.0
+	 */	
+	public function c80_name( $postid, $key ) {
+		return 'parrafo-' . $this->c80_pid($key, $postid);
 	}
 
 	/**
