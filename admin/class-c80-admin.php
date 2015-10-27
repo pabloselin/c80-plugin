@@ -302,34 +302,72 @@ class c80_Admin {
 			$args = array(
 				'post_type' => 'c80_cpt',
 				'numberposts' => -1,
-				'order_by' => 'menu_order',
+				'orderby' => 'menu_order',
 				'order' => 'ASC'
 				);
 			$prearticulos = get_posts($args);
 			foreach($prearticulos as $prearticulo) {
-				if($prearticulo->post_parent != 0) {
+				$argsch = array(
+					'post_type' => 'c80_cpt',
+					'post_parent' => $prearticulo->ID
+					);
+				$children = count( get_children( $argsch ) );
+				
+				if($children == 0) {
 					$articulos[$prearticulo->ID] = $prearticulo->post_title;	
 				}
 			}
-
-			if( isset($postid) && get_post_meta($postid, 'c80_artrel') ) {
-				
-				$parrafos_articulo = get_post_meta( $postid, 'c80_artrel', true );
-				
-				$parrafos_contenidos = rwmb_meta('c80_parrafo', 'multiple=true', $parrafos_articulo);
-					
-				foreach($parrafos_contenidos[0] as $key=>$parrafo_contenido) {
-					
-					$extracto_parrafo = substr($parrafo_contenido, 0, 40) . '&hellip;';
-					$contador = $key + 1;
-					$parrafos[$key . '-' . $parrafos_articulo] = 'Párrafo ' . $contador . ': ' . $extracto_parrafo;
-				}	
-				
-			} else {
-				$parrafos = array( '0' => 'Escoge un artículo relacionado y guarda el contenido para poder ver los párrafos disponibles');
-			}
 			
+			$relfields = array();
 
+			$relfields[] = array(
+							'name' => 'Artículo a relacionar',
+							'desc' => 'Artículo de la Constitución que se relaciona con este contenido.',
+							'id' => $prefix . '_artrel',
+							'type' => 'select',
+							'options' => $articulos,
+							'placeholder' => 'Escoge uno o más artículos relacionados...',
+							'multiple' => true
+							);
+
+
+			if(isset($postid) && get_post_meta($postid, 'c80_artrel')) {
+				$articulos_relacionados = rwmb_meta('c80_artrel', 'multiple=true&type=select', $postid);
+				
+				foreach($articulos_relacionados as $key=>$articulo_relacionado) {
+				$artname = get_the_title($articulo_relacionado);
+
+				$contenidos = rwmb_meta('c80_parrafo','multiple=true', $articulo_relacionado);
+				$parrafos = array();
+				
+					foreach($contenidos[0] as $keyp=>$contenido_parrafo):
+						$parcount = $keyp + 1;
+						$parrafos[$keyp . '-' . $articulo_relacionado ] = 'Párrafo ' . $parcount  . ': ' . substr($contenido_parrafo,0, 70);
+					endforeach;
+
+					$relfields[] = array(
+							'name' => 'Párrafos del ' . $artname,
+							'desc' => 'Párrafo del artículo a relacionar, se puede seleccionar una vez escogido el artículo y guardado el contenido. Se pueden relacionar varios párrafos con la tecla Ctrl o Cmd, no es necesario tener un párrafo relacionado.',
+							'id' => $prefix . '_parraforel',
+							'type' => 'select',
+							'options' => $parrafos,
+							'placeholder' => 'Escoge un párrafo ...',
+							'multiple' => true
+							);
+				
+						
+				}
+			} else {
+				$relfields[] = array(
+							'name' => 'Párrafos a Relacionar',
+							'desc' => 'Aún no se pueden seleccionar párrafos',
+							'id' => $prefix . '_parraforel',
+							'type' => 'select',
+							'options' => array('0' => '0'),
+							'placeholder' => 'Selecciona artículo para escoger párrafos',
+							'multiple' => true
+							);
+			}
 
 			//Relaciones
 			$meta_boxes[] = array(
@@ -338,30 +376,8 @@ class c80_Admin {
 				'pages' => array('post', 'columnas'),
 				'context' => 'normal',
 				'priority' => 'high',
-				'fields' => array(
-					array(
-						'name' => 'Artículo a relacionar',
-						'desc' => 'Artículo de la Constitución que se relaciona con este contenido.',
-						'id' => $prefix . '_artrel',
-						'type' => 'select',
-						'options' => $articulos,
-						'placeholder' => 'Escoge uno o más artículos relacionados...',
-						'multiple' => true
-						)
-					// Desactivado momentáneamente
-					// array(
-					// 	'name' => 'Párrafo del artículo',
-					// 	'desc' => 'Párrafo del artículo a relacionar, se puede seleccionar una vez escogido el artículo y guardado el contenido. Se pueden relacionar varios párrafos con la tecla Ctrl o Cmd, no es necesario tener un párrafo relacionado.',
-					// 	'id' => $prefix . '_parraforel',
-					// 	'type' => 'select',
-					// 	'options' => $parrafos,
-					// 	'placeholder' => 'Escoge un párrafo ...',
-					// 	'multiple' => true
-					// 	)
-					)
-
+				'fields' => $relfields
 				);
-
 			return $meta_boxes;
 		}
 }
