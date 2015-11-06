@@ -324,6 +324,7 @@ class c80_Admin {
 							'name' => 'Artículo a relacionar',
 							'desc' => 'Artículo de la Constitución que se relaciona con este contenido.',
 							'id' => $prefix . '_artrel',
+							'class' => 'highselect',
 							'type' => 'select',
 							'options' => $articulos,
 							'placeholder' => 'Escoge uno o más artículos relacionados...',
@@ -338,21 +339,24 @@ class c80_Admin {
 				$artname = get_the_title($articulo_relacionado);
 
 				$contenidos = rwmb_meta('c80_parrafo','multiple=true', $articulo_relacionado);
-				$parrafos = array();
 				
 					foreach($contenidos[0] as $keyp=>$contenido_parrafo):
 						$parcount = $keyp + 1;
 						$parrafos[$keyp . '-' . $articulo_relacionado ] = 'Párrafo ' . $parcount  . ': ' . substr($contenido_parrafo,0, 70);
 					endforeach;
 
+
+
 					$relfields[] = array(
 							'name' => 'Párrafos del ' . $artname,
 							'desc' => 'Párrafo del artículo a relacionar, se puede seleccionar una vez escogido el artículo y guardado el contenido. Se pueden relacionar varios párrafos con la tecla Ctrl o Cmd, no es necesario tener un párrafo relacionado.',
 							'id' => $prefix . '_parraforel',
 							'type' => 'select',
+							'class' => 'highselect',
 							'options' => $parrafos,
 							'placeholder' => 'Escoge un párrafo ...',
-							'multiple' => true
+							'multiple' => true,
+							'after' => '...'
 							);
 				
 						
