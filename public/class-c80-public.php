@@ -197,7 +197,8 @@ class c80_Public {
 		
 		$html .= '</p>';
 
-		return $html;
+		$nothing = '';
+		return $nothing;//$html;
 	}
 
 	/**
@@ -207,6 +208,15 @@ class c80_Public {
 	 */
 	public function c80_pid( $key, $postid ) {
 		return $key . '-' . $postid;
+	}
+
+	/**
+	 * Devuelve un post ID de un Párrafo ID
+	 */
+	public function c80_invpid( $parrafoid ) {
+		$parrafoid = explode('-', $parrafoid);
+		//La segunda clave del array es la del ID del artículo
+		return $parrafoid[1];
 	}
 
 	/**
