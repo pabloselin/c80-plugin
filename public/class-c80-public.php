@@ -105,7 +105,7 @@ class c80_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function c80_content( $content ) {
+	public function c80_content( $content, $limit = NULL, $afterp = true ) {
 		
 		global $post;
 		
@@ -125,7 +125,6 @@ class c80_Public {
 				//var_dump($parrafos);
 				
 				foreach(  $parrafos[0] as $key=>$parrafo ) {
-
 					$extraclasses = '';
 					
 					$relids = $this->c80_relp( $this->c80_pid( $key, $post->ID ) );
@@ -140,7 +139,10 @@ class c80_Public {
 					//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
 					//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
 
-					$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($post->ID, $key) .'" name="'. $this->c80_name($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($post->ID, $key) . '"><p>' . $parrafo . '</p></a>'. $this->c80_afterp( $post->ID, $key );
+					$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($post->ID, $key) .'" name="'. $this->c80_name($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($post->ID, $key) . '"><p>' . $parrafo . '</p></a>';
+					if($afterp == true) {
+						$content .= $this->c80_afterp( $post->ID, $key );
+					}
 				}
 		
 			}
