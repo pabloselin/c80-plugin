@@ -337,7 +337,7 @@ class c80_Admin {
 				
 				foreach($articulos_relacionados as $key=>$articulo_relacionado) {
 				$artname = get_the_title($articulo_relacionado);
-
+				$parrafos = array();
 				$contenidos = rwmb_meta('c80_parrafo','multiple=true', $articulo_relacionado);
 				
 					foreach($contenidos[0] as $keyp=>$contenido_parrafo):
