@@ -386,7 +386,6 @@ class c80_Admin {
 					$artname = get_the_title($articulo_relacionado);
 					$parrafos = array();
 					$contenidos = get_post_meta($articulo_relacionado, 'c80_parrafo', false);
-					xdebug_break();
 
 					foreach($contenidos[0] as $keyp=>$contenido_parrafo):
 						$parcount = $keyp + 1;
