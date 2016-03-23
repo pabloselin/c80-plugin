@@ -159,7 +159,7 @@ class c80 {
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		
 		if(class_exists( 'RW_Meta_Box' ) ) {
-			$this->loader->add_filter( 'rwmb_meta_boxes', $plugin_admin, 'create_metaboxes' );		
+			$this->loader->add_filter( 'rwmb_meta_boxes', $plugin_admin, 'c80_create_metaboxes' );		
 		}
 	}
 

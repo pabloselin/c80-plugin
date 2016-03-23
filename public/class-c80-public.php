@@ -124,7 +124,7 @@ class c80_Public {
 		
 				//var_dump($parrafos);
 				
-				foreach(  $parrafos[0] as $key=>$parrafo ) {
+				foreach(  $parrafos as $key=>$parrafo ) {
 					$extraclasses = '';
 					
 					$relids = $this->c80_relp( $this->c80_pid( $key, $post->ID ) );
