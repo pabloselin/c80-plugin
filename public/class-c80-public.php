@@ -152,6 +152,212 @@ class c80_Public {
 		return $content;
 	}
 
+		public function c80_rest_content( $id ) {
+		
+		/**
+		 * Devuelve el contenido de C80 para el REST API en un array con IDS
+		 */
+		
+		$content = array();
+		
+		if(class_exists('RW_Meta_Box')) {
+		
+			if(rwmb_meta( 'c80_parrafo', $id )) {
+		
+				//Reemplazo la variable de contenido
+		
+				$content = '';
+				
+		
+				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $id );
+		
+				//var_dump($parrafos);
+				
+
+				foreach(  $parrafos as $key=>$parrafo ) {
+					$extraclasses = '';
+					
+					$relids = $this->c80_relp( $this->c80_pid( $key, $id ) );
+					
+					if($relids != 0) {
+						$relids = implode($relids, ', ');
+						$relids = ' data-relids="'. $relids . '"';
+						$extraclasses = 'con-rel';
+					} else {
+						$relids = '';
+					}
+					//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
+					//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
+
+					$content[ $key ] = $parrafo;
+					
+
+				}
+		
+			}
+		
+
+		}
+
+		
+		if( isset( $content ) ) {
+
+			return $content;	
+
+		}
+		
+	}
+
+	public function c80_jsonpreparedata( $data, $post, $context ) {
+			
+
+			unset( $data->data['author'] );
+			unset( $data->data['status'] );
+			unset( $data->data['date'] );
+			unset( $data->data['date_gmt'] );
+			unset( $data->data['guid'] );
+			unset( $data->data['modified'] );
+			unset( $data->data['modified_gmt'] );
+			unset( $data->data['guid'] );
+			unset( $data->data['version_history'] );
+			unset( $data->data['comment_status'] );
+			unset( $data->data['ping_status'] );
+			unset( $data->data['curies'] );
+			unset( $data->data['wp:attachment'] );
+			unset( $data->data['up'] );
+			unset( $data->data['_links'] );
+			unset( $data->data['ping_status'] );
+			unset( $data->data['type'] );
+  			
+  			//Añado los párrafos de la constitución
+  			$parrafos = $this->c80_rest_content( $data->data['id'] );
+  			
+
+  			if( !empty($parrafos) ) {
+
+  				foreach($parrafos as $key => $parrafo) {
+
+  					$data->data['contenido'][$key] =  $parrafo;
+
+  				}
+  				
+
+  			}
+
+			return $data;
+		}
+
+	/**
+	 * Devuelve el ID del capítulo vinculado al número
+	 */
+	public function c80_jsonget( WP_REST_Request $request ) {
+
+		$capno = $request['id'];
+
+		$chapter_item = $this->c80_getchapter_bymeta($capno);
+
+		//Construyo el objeto capítulo
+		
+		$chapter['title']     = $chapter_item->post_title;
+		$chapter['subtitle']  = get_post_meta($chapter_item->ID, 'c80_subtartcap', true);
+
+		$args = array(
+			'post_type' 	=> 'c80_cpt',
+			'post_parent' 	=> $chapter_item->ID,
+			'numberposts' 	=> -1,
+			'orderby'		=> 'menu_order',
+			'order'			=> 'ASC'
+			);
+		
+		$articulos = get_posts($args);
+
+		foreach($articulos as $key => $articulo) {
+
+			$contenido = rwmb_meta('c80_parrafo', 'multiple=true', $articulo->ID );
+
+			//Llamo a subartículos si es que aplica
+			
+			$subargs = array(
+				'post_type' => 'c80_cpt',
+				'numberposts' => -1,
+				'post_parent' => $articulo->ID,
+				'orderby' => 'menu_order',
+				'order' => 'ASC'
+				);
+
+			$subarticulos = get_posts($subargs);
+
+			if($subarticulos) {
+
+				foreach($subarticulos as $subarticulo) {
+
+					$subcontenido = rwmb_meta('c80_parrafo', 'multiple=true', $subarticulo->ID );
+					$subarticulos_filtrado[] = array(
+						'title' => $subarticulo->post_title,
+						'contenido' => $subcontenido
+						);
+
+				}
+
+				$chapter['articulos'][$key] = array(
+							'seccion' => $articulo->post_title,
+							'articulos' => $subarticulos_filtrado
+							);
+
+			} else {
+					
+					$chapter['articulos'][$key] = array(
+							'title' => $articulo->post_title,
+							'contenido' => $contenido
+							);
+
+
+			}
+
+
+		}
+		
+
+
+		return $chapter;
+
+	}
+
+	public function c80_getchapter_bymeta( $chapter ) {
+
+		$args = array(
+			'numberposts' => 1,
+			'post_type' => 'c80_cpt',
+			'meta_key'  => 'c80_capno',
+			'meta_value' => $chapter
+			);
+
+		$cap_post = get_posts($args);
+		$cap_post_id = $cap_post[0]->ID;
+
+		return $cap_post[0];
+
+	}
+
+	/**
+	 * Creates custom routes for REST API
+	 */
+	public function c80_restapi_init() {
+		register_rest_route( 'constitucion1980/v1/', 'capitulo/(?P<id>\d+)', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'c80_jsonget' ),
+			'args' => array(
+						'id' => array(
+							'validate_callback' => function($param, $request, $key) {
+								return is_numeric( $param );
+							}
+
+							)
+					)
+				)
+			);
+	}
+
 	/**
 	 * Generates paragraph permalink in article
 	 *

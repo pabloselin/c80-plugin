@@ -235,6 +235,9 @@ class c80_Admin {
 				'public'              => true,
 				'show_ui'             => true,
 				'show_in_menu'        => true,
+				//REST API PARAMS
+				'show_in_rest'		  => true,
+				'rest_base'			  => 'constitucion/1980',
 				'menu_position'       => 5,
 				'menu_icon'           => 'dashicons-book-alt',
 				'show_in_admin_bar'   => true,
@@ -307,6 +310,23 @@ class c80_Admin {
 			 }
 
 			$prefix = $this->c80;
+
+			//Número capítulo
+			$meta_boxes[] = array(
+				'id' => 'capitulo_c80',
+				'title' => 'Número de capítulo',
+				'pages' => array('c80_cpt'),
+				'context'=> 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Número de capítulo',
+						'desc' => 'El número del capítulo para consultas en la API',
+						'id' => $prefix . '_capno',
+						'type' => 'text'
+						)
+					)
+				);
 
 			//Subtítulo para capítulos y usos eventuales
 			$meta_boxes[] = array(
@@ -430,4 +450,5 @@ class c80_Admin {
 				);
 			return $meta_boxes;
 		}
+
 }
