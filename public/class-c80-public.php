@@ -258,68 +258,83 @@ class c80_Public {
 
 		//Construyo el objeto capítulo
 		
-		$chapter['title']     = $chapter_item->post_title;
-		$chapter['subtitle']  = get_post_meta($chapter_item->ID, 'c80_subtartcap', true);
+		if($chapter_item) {
 
-		$args = array(
-			'post_type' 	=> 'c80_cpt',
-			'post_parent' 	=> $chapter_item->ID,
-			'numberposts' 	=> -1,
-			'orderby'		=> 'menu_order',
-			'order'			=> 'ASC'
-			);
-		
-		$articulos = get_posts($args);
+			$chapter['title']     = $chapter_item->post_title;
+			$chapter['subtitle']  = get_post_meta($chapter_item->ID, 'c80_subtartcap', true);
 
-		foreach($articulos as $key => $articulo) {
-
-			$contenido = rwmb_meta('c80_parrafo', 'multiple=true', $articulo->ID );
-
-			//Llamo a subartículos si es que aplica
-			
-			$subargs = array(
-				'post_type' => 'c80_cpt',
-				'numberposts' => -1,
-				'post_parent' => $articulo->ID,
-				'orderby' => 'menu_order',
-				'order' => 'ASC'
+			$args = array(
+				'post_type' 	=> 'c80_cpt',
+				'post_parent' 	=> $chapter_item->ID,
+				'numberposts' 	=> -1,
+				'orderby'		=> 'menu_order',
+				'order'			=> 'ASC'
 				);
 
-			$subarticulos = get_posts($subargs);
+			$articulos = get_posts($args);
 
-			if($subarticulos) {
+			foreach($articulos as $key => $articulo) {
 
-				foreach($subarticulos as $subarticulo) {
+				$contenido = rwmb_meta('c80_parrafo', 'multiple=true', $articulo->ID );
 
-					$subcontenido = rwmb_meta('c80_parrafo', 'multiple=true', $subarticulo->ID );
-					$subarticulos_filtrado[] = array(
-						'title' => $subarticulo->post_title,
-						'contenido' => $subcontenido
+			//Llamo a subartículos si es que aplica
+
+				$subargs = array(
+					'post_type' => 'c80_cpt',
+					'numberposts' => -1,
+					'post_parent' => $articulo->ID,
+					'orderby' => 'menu_order',
+					'order' => 'ASC'
+					);
+
+				$subarticulos = get_posts($subargs);
+
+				if($subarticulos) {
+
+					foreach($subarticulos as $subarticulo) {
+
+						$subcontenido = rwmb_meta('c80_parrafo', 'multiple=true', $subarticulo->ID );
+						$subarticulos_filtrado[] = array(
+							'title' => $subarticulo->post_title,
+							'contenido' => $subcontenido
+							);
+
+					}
+
+					$chapter['articulos'][$key] = array(
+						'seccion' => $articulo->post_title,
+						'articulos' => $subarticulos_filtrado
 						);
 
-				}
-
-				$chapter['articulos'][$key] = array(
-							'seccion' => $articulo->post_title,
-							'articulos' => $subarticulos_filtrado
-							);
-
-			} else {
+				} else {
 					
 					$chapter['articulos'][$key] = array(
-							'title' => $articulo->post_title,
-							'contenido' => $contenido
-							);
+						'title' => $articulo->post_title,
+						'contenido' => $contenido
+						);
+
+
+				}
 
 
 			}
 
 
+
+			return $chapter;
+
+		} else {
+
+			$error = array(
+				'code' => 'rest_not_found',
+				'message' => 'No se encontró contenido o no existe el capítulo',
+				'data' => array(
+					'status' => 404
+					)
+				);
+
+			return $error;
 		}
-		
-
-
-		return $chapter;
 
 	}
 
@@ -333,9 +348,12 @@ class c80_Public {
 			);
 
 		$cap_post = get_posts($args);
-		$cap_post_id = $cap_post[0]->ID;
+		if( !empty( $cap_post )):
+			$cap_post_id = $cap_post[0]->ID;
 
-		return $cap_post[0];
+			return $cap_post[0];
+
+		endif;
 
 	}
 
