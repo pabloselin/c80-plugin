@@ -328,6 +328,23 @@ class c80_Admin {
 					)
 				);
 
+			//Número capítulo
+			$meta_boxes[] = array(
+				'id' => 'articulo_c80',
+				'title' => 'Número de artículo',
+				'pages' => array('c80_cpt'),
+				'context'=> 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Número de artículo',
+						'desc' => 'El número del artículo para consultas en la API (ej. 18bis)',
+						'id' => $prefix . '_artno',
+						'type' => 'text'
+						)
+					)
+				);
+
 			//Subtítulo para capítulos y usos eventuales
 			$meta_boxes[] = array(
 				'id'=> 'subtitulo_artcap',

@@ -253,12 +253,13 @@ class c80_Public {
 	public function c80_jsonget( WP_REST_Request $request ) {
 
 		$capno = $request['id'];
-
-		$chapter_item = $this->c80_getchapter_bymeta($capno);
+		$artno = $request['articulokey'];	
 
 		//Construyo el objeto capítulo
 		
-		if($chapter_item) {
+		if( isset($capno) ) {
+
+			$chapter_item = $this->c80_getchapter_bymeta($capno);	
 
 			$chapter['title']     = $chapter_item->post_title;
 			$chapter['subtitle']  = get_post_meta($chapter_item->ID, 'c80_subtartcap', true);
@@ -323,6 +324,15 @@ class c80_Public {
 
 			return $chapter;
 
+		} elseif( isset($artno) ) {
+
+			$articulo_item = $this->c80_getarticle_bymeta( $artno );
+
+			$articulo['title'] = $articulo_item->post_title;
+			$articulo['contenido'] = rwmb_meta('c80_parrafo', 'multiple=true', $articulo_item->ID );
+
+			return $articulo;
+
 		} else {
 
 			$error = array(
@@ -348,10 +358,32 @@ class c80_Public {
 			);
 
 		$cap_post = get_posts($args);
+		
 		if( !empty( $cap_post )):
 			$cap_post_id = $cap_post[0]->ID;
-
 			return $cap_post[0];
+
+		endif;
+
+	}
+
+	/**
+	 * Devuelve artículo por meta value
+	 */
+	public function c80_getarticle_bymeta( $article ) {
+
+		$args = array(
+			'numberposts' => 1,
+			'post_type' => 'c80_cpt',
+			'meta_key'  => 'c80_artno',
+			'meta_value' => $article
+			);
+
+		$art_post = get_posts($args);
+		
+		if( !empty( $art_post )):
+			$art_post_id = $art_post[0]->ID;
+			return $art_post[0];
 
 		endif;
 
@@ -371,9 +403,21 @@ class c80_Public {
 							}
 
 							)
+						)
+					)
+			);
+		register_rest_route('constitucion1980/v1/', '/articulo/(?P<articulokey>\w+)', array(
+			'methods' => 'GET',
+			'callback' => array( $this, 'c80_jsonget' ),
+			'args' => array(
+					'articulokey' => array(
+						'validate_callback' => function($param, $request, $key) {
+							return sanitize_text_field( $param );
+						}
 					)
 				)
-			);
+			)
+		);
 	}
 
 	/**
