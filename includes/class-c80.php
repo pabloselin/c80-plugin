@@ -119,6 +119,11 @@ class c80 {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-c80-public.php';
 
+		/**
+		 * DIFF functionality
+		 */
+		require plugin_dir_path( __FILE__ ) . 'class.Diff.php';
+
 		$this->loader = new c80_Loader();
 
 	}
@@ -157,7 +162,13 @@ class c80 {
 		$this->loader->add_action( 'init', $plugin_admin, 'custom_content');
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu');
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
-		
+
+		//Remove yoast boxes
+		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'c80_removeyoast');
+		////add_action( 'manage_c80_cpt_posts_custom_column', 'c80_columnas_especiales', 10, 2 );
+		//add_filter( 'manage_edit-c80_cpt_columns', 'c80_cpt_columnas' ) ;
+		$this->loader->add_action('manage_edit-c80_cpt_columns', $plugin_admin, 'c80_cpt_columnas');
+		$this->loader->add_action('manage_c80_cpt_posts_custom_column', $plugin_admin, 'c80_columnas_especiales', 10, 2);
 		
 		if(class_exists( 'RW_Meta_Box' ) ) {
 			$this->loader->add_filter( 'rwmb_meta_boxes', $plugin_admin, 'c80_create_metaboxes' );		

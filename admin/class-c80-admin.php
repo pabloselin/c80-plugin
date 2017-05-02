@@ -198,6 +198,11 @@ class c80_Admin {
 			$html =	'<input type="text" id="' . $this->c80 . '-options[import-file]" name="' . $this->c80 . '-options[import-file]" value="' . $options['text-file'] .'"></input>';
 	}
 
+	public function c80_removeyoast() {
+    	remove_meta_box('wpseo_meta', 'c80_cpt', 'normal');
+		remove_meta_box('wpseo_meta', 'c80_cptrev', 'normal');
+	}
+
 
 	// Register Custom Post Type
 	public function custom_content() {
@@ -295,7 +300,57 @@ class c80_Admin {
 				'rewrite'             => $rewrite,
 				'capability_type'     => 'post',
 			);
-			register_post_type( 'c80_timeline', $args );
+			//register_post_type( 'c80_timeline', $args );
+
+			$labelsrev = array(
+				'name'                => _x( 'Revisión artículos Constitución', 'Revisión Artículos', 'c80' ),
+				'singular_name'       => _x( 'Revisión artículo Constitución', 'Revisión artículo', 'c80' ),
+				// 'menu_name'           => __( 'Constitución 1980', 'c80' ),
+				// 'name_admin_bar'      => __( 'Constitución 1980', 'c80' ),
+				//'parent_item_colon'   => __( 'Artículo superior', 'c80' ),
+				'all_items'           => __( 'Todas las revisiones', 'c80' ),
+				'add_new_item'        => __( 'Añadir nueva revisión', 'c80' ),
+				'add_new'             => __( 'Añadir nueva', 'c80' ),
+				'new_item'            => __( 'Nueva revisión', 'c80' ),
+				'edit_item'           => __( 'Editar revisión', 'c80' ),
+				'update_item'         => __( 'Actualizar revisión', 'c80' ),
+				'view_item'           => __( 'Ver revisión', 'c80' ),
+				'search_items'        => __( 'Buscar revisión', 'c80' ),
+				'not_found'           => __( 'No encontrado', 'c80' ),
+				'not_found_in_trash'  => __( 'No encontrado en Papelera', 'c80' ),
+			);
+			$rewrite = array(
+				'slug'                => 'revisiones',
+				'with_front'          => true,
+				'pages'               => true,
+				'feeds'               => true,
+			);
+			$args = array(
+				'label'               => __( 'Revisiones', 'c80' ),
+				'description'         => __( 'Revisiones de artículos de la constitución', 'c80' ),
+				'labels'              => $labelsrev,
+				'supports'            => array( 'title','revisions', 'custom-fields', 'page-attributes', ),
+				'taxonomies'          => array( ),
+				'hierarchical'        => false,
+				'public'              => true,
+				'show_ui'             => true,
+				'show_in_menu'        => true,
+				//REST API PARAMS
+				'show_in_rest'		  => false,
+				'rest_base'			  => 'revisiones',
+				'menu_position'       => 5,
+				'menu_icon'           => 'dashicons-book-alt',
+				'show_in_admin_bar'   => false,
+				'show_in_nav_menus'   => false,
+				'can_export'          => true,
+				'has_archive'         => true,		
+				'exclude_from_search' => true,
+				'publicly_queryable'  => false,
+				'rewrite'             => $rewrite,
+				'capability_type'     => 'page',
+			);
+			register_post_type( 'c80_cptrev', $args );
+
 
 		}
 
@@ -349,7 +404,7 @@ class c80_Admin {
 			$meta_boxes[] = array(
 				'id'=> 'subtitulo_artcap',
 				'title' => 'Subtítulo',
-				'pages' => array('c80_cpt'),
+				'pages' => array('c80_cpt', 'c80_cptrev'),
 				'context' => 'normal',
 				'priority' => 'high',
 				'fields' => array(
@@ -367,7 +422,7 @@ class c80_Admin {
 			$meta_boxes[] = array(
 				'id' => 'parrafo_articulo',
 				'title' => 'Contenidos Artículo (por párrafo)',
-				'pages' => array('c80_cpt'),
+				'pages' => array('c80_cpt', 'c80_cptrev'),
 				'context'=> 'normal',
 				'priority' => 'high',
 				'fields' => array(
@@ -400,6 +455,71 @@ class c80_Admin {
 					$articulos[$prearticulo->ID] = $prearticulo->post_title;	
 				}
 			}
+
+			$artcaps = array();
+			foreach($prearticulos as $prearticulo) {
+				$artcaps[$prearticulo->ID] = $prearticulo->post_title;
+			}
+
+			$std = (isset($_GET['pid']))? $_GET['pid'] : '0';
+
+			//artículo que modifica
+			$meta_boxes[] = array(
+				'id' => 'parent_modartid',
+				'title' => 'Artículo que modifica',
+				'pages' => array('c80_cptrev'),
+				'context'=> 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Artículo',
+						'desc' => 'Escoge un artículo al que se vincula esta modificación',
+						'id' => $prefix . '_artselect',
+						'type' => 'select',
+						'options' => $artcaps,
+						'std' => $std
+						)
+					)
+				);
+
+			$meta_boxes[] = array(
+				'id' => 'urlmod',
+				'title' => 'Referencia de modificación en leychile.cl',
+				'pages' => array('c80_cptrev'),
+				'context'=> 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'URL',
+						'desc' => 'Colocar la URL donde se referencia la modificación',
+						'id' => $prefix . '_modurlexternal',
+						'type' => 'url'
+						)
+					)
+				);
+			
+			//artículo que modifica
+			$meta_boxes[] = array(
+				'id' => 'newartidstatus',
+				'title' => 'Estado del artículo',
+				'pages' => array('c80_cpt'),
+				'context'=> 'normal',
+				'priority' => 'high',
+				'fields' => array(
+					array(
+						'name' => 'Añadido',
+						'desc' => 'Marca si es que este es un artículo <strong>añadido</strong> a la constitución original',
+						'id' => $prefix . '_artadded',
+						'type' => 'checkbox'
+						),
+					array(
+						'name' => 'Derogado',
+						'desc' => 'Marca si es que este es un artículo <strong>derogado</strong> de la constitución original',
+						'id' => $prefix . '_artderogated',
+						'type' => 'checkbox'
+						)
+					)
+				);
 			
 			$relfields = array();
 
@@ -467,5 +587,72 @@ class c80_Admin {
 				);
 			return $meta_boxes;
 		}
+
+//add_filter( 'manage_edit-c80_cpt_columns', 'c80_cpt_columnas' ) ;
+
+public function c80_cpt_columnas( $columns ) {
+
+	$columns = array(
+		'cb' 						=> '<input type="checkbox" />',
+		'title' 					=> __( 'Título' ),
+		'modificacion' 				=> __( 'Modificación' ),
+		'tags' 						=> __( 'Temas' ),	
+	);
+
+	return $columns;
+}
+
+//add_action( 'manage_c80_cpt_posts_custom_column', 'c80_columnas_especiales', 10, 2 );
+
+public function c80_columnas_especiales( $column, $post_id ) {
+	global $post;
+
+	switch( $column ) {
+
+		/* If displaying the 'duration' column. */
+		case 'modificacion' :
+
+			/* Get the post meta. */
+			$modificacion = c80_Public::c80_checkmod($post_id);
+
+			/* If no duration is found, output a default message. */
+			if ( empty( $modificacion ) ){
+			
+				$link = admin_url('post-new.php?post_type=c80_cptrev') . '&pid=' . $post_id;
+				echo '<a class="button" href="' . esc_url($link) . '">Añadir Modificacion</a>';
+
+			/* If there is a duration, append 'minutes' to the text string. */
+			} else {
+				$link = get_edit_post_link( $modificacion );
+				echo '<a class="button-primary" href="' . $link . '">Editar Modificacion</a>';
+			}
+
+			break;
+
+		/* If displaying the 'genre' column. */
+		case 'portada' :
+
+			/* Get the genres for the post. */
+			$portada = get_post_meta($post_id, 'release_cover', true);
+
+			if($portada) {
+
+				$portadasrc = wp_get_attachment_image_src( $portada, 'thumbnail' );
+				
+				echo '<img width="90" height="90" src="' . $portadasrc[0] . '" alt="Portada ' . get_the_title( $post_id ) . '">';
+
+			} else {
+
+				echo '...';
+
+			}
+
+			break;
+
+		/* Just break out of the switch statement for everything else. */
+		default :
+			break;
+	}
+}
 
 }

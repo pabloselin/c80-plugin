@@ -118,32 +118,33 @@ class c80_Public {
 				//Reemplazo la variable de contenido
 		
 				$content = '';
-				
+				$artmods = $this->c80_checkmod($post->ID);
 		
 				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $post->ID );
-		
-				//var_dump($parrafos);
-				
-				foreach(  $parrafos as $key=>$parrafo ) {
-					$extraclasses = '';
-					
-					$relids = $this->c80_relp( $this->c80_pid( $key, $post->ID ) );
-					
-					if($relids != 0) {
-						$relids = implode($relids, ', ');
-						$relids = ' data-relids="'. $relids . '"';
-						$extraclasses = 'con-rel';
-					} else {
-						$relids = '';
-					}
-					//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
-					//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
 
-					$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($post->ID, $key) .'" name="'. $this->c80_name($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($post->ID, $key) . '"><p>' . $parrafo . '</p></a>';
-					if($afterp == true) {
-						$content .= $this->c80_afterp( $post->ID, $key );
+					foreach(  $parrafos as $key=>$parrafo ) {
+						$extraclasses = '';
+						//Si tiene modificación tomo el primer post y lo muestro
+						$postid = ($artmods)? $artmods : $post->ID;
+
+						$relids = $this->c80_relp( $this->c80_pid( $key, $post->ID ) );
+						
+						if($relids != 0) {
+							$relids = implode($relids, ', ');
+							$relids = ' data-relids="'. $relids . '"';
+							$extraclasses = 'con-rel';
+						} else {
+							$relids = '';
+						}
+						//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
+						//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
+
+						$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($post->ID, $key) .'" name="'. $this->c80_name($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($post->ID, $key) . '"><p>' . $parrafo . '</p></a>';
+						if($afterp == true) {
+							$content .= $this->c80_afterp( $post->ID, $key );
+						}
 					}
-				}
+		
 		
 			}
 		
@@ -151,6 +152,89 @@ class c80_Public {
 		
 		return $content;
 	}
+
+	public static function c80_showdiff( $postid ) {
+		/**
+		 * Devuelve dos bloques de texto con contenido de constitución para poder hacer un diff sobre ellos
+		 *
+		 * @param [type] $postid
+		 * @return string
+		 */
+		
+		$post_type = get_post_type( $postid );
+		
+		if($post_type == 'c80_cpt' && class_exists('RW_Meta_Box')) { 
+			$checkmod = c80_Public::c80_checkmod($postid);
+			
+			if($checkmod) {
+				$oldcontent = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
+				$newcontent = rwmb_meta('c80_parrafo', 'multiple=true', $checkmod);
+
+				$oldcontentps = array();
+				$newcontentps = array();
+
+				foreach($oldcontent as $oldparagraph) {
+					$oldcontentps[] = preg_replace('/[^\P{C}\n]+/u', '',$oldparagraph);
+				};
+
+				foreach($newcontent as $newparagraph) {
+					$newcontentps[] = preg_replace('/[^\P{C}\n]+/u', '',$newparagraph);
+				};
+
+				$oldcontentstring = implode("\n", $oldcontentps);
+				$newcontentstring = implode("\n", $newcontentps);
+				
+
+				return [$oldcontentstring, $newcontentstring];
+			}	
+		}
+
+	}
+
+		public static function c80_checkmod( $postid) {
+			/**
+			 * Chequea si un artículo tiene modificaciones
+			 *
+			 * @param string $postid
+			 * @return string postid
+			 */
+
+				/**
+				 * Aquí hay que buscar cuales si el artículo contiene alguna modificación o versión posterior
+				 */
+				$searchargs = array(
+					'post_type' => 'c80_cptrev',
+					'numberposts' => -1,
+				);
+
+				$searchargs['meta_query'] = array(
+					array(
+						'key' => 'c80_artselect',
+						'value' => $postid
+					)
+				);
+
+				$artmods = get_posts($searchargs);
+
+				if($artmods):
+					return $artmods[0]->ID;
+				else:
+					return false;
+				endif;
+		}
+
+		public static function c80_checknew( $postid ) {
+			/**
+			 * Chequea si un artículo es AÑADIDO a la constitución
+			 *
+			 * @param string $postid
+			 * @return bool
+			 */
+
+			$isnew = get_post_meta($postid, 'c80_artadded', true);
+
+			return $isnew;
+		}
 
 		public function c80_rest_content( $id ) {
 		
@@ -477,7 +561,14 @@ class c80_Public {
 	 * @since    1.0.0
 	 */
 	public function c80_pid( $key, $postid ) {
-		return $key . '-' . $postid;
+		//Chequea si hay un modificador
+		$modid = $this->c80_checkmod($postid);
+		if($modid) {
+			return 'mod-' . $key . '-' . $modid;
+		} else {
+			return $key . '-' . $postid;
+		}
+		
 	}
 
 	/**
