@@ -361,7 +361,7 @@ class c80_Admin {
 	public function c80_create_metaboxes( $meta_boxes ) {
 			
 			 if(array_key_exists('post', $_GET)) {
-			 	$postid = $_GET['post'];	
+			 	$postid = $_GET['post'];
 			 }
 
 			$prefix = $this->c80;
@@ -444,6 +444,7 @@ class c80_Admin {
 				'order' => 'ASC'
 				);
 			$prearticulos = get_posts($args);
+
 			foreach($prearticulos as $prearticulo) {
 				$argsch = array(
 					'post_type' => 'c80_cpt',
@@ -453,6 +454,11 @@ class c80_Admin {
 				
 				if($children == 0) {
 					$articulos[$prearticulo->ID] = $prearticulo->post_title;	
+					
+					$checkmod = c80_Public::c80_checkmod($prearticulo->ID);	
+					if($checkmod) {
+						$articulos[$checkmod] = get_the_title($checkmod) . ' [MOD]';
+					}
 				}
 			}
 
@@ -485,10 +491,16 @@ class c80_Admin {
 			$meta_boxes[] = array(
 				'id' => 'urlmod',
 				'title' => 'Referencia de modificación en leychile.cl',
-				'pages' => array('c80_cptrev'),
+				'pages' => array('c80_cptrev', 'c80_cpt'),
 				'context'=> 'normal',
 				'priority' => 'high',
 				'fields' => array(
+					array(
+						'name' => 'Título',
+						'desc' => 'Título o indicador de la modificacion',
+						'id' => $prefix . '_modtxtdesc',
+						'type' => 'textarea'
+						),
 					array(
 						'name' => 'URL',
 						'desc' => 'Colocar la URL donde se referencia la modificación',
@@ -614,17 +626,21 @@ public function c80_columnas_especiales( $column, $post_id ) {
 
 			/* Get the post meta. */
 			$modificacion = c80_Public::c80_checkmod($post_id);
+			$newlink = admin_url('post-new.php?post_type=c80_cptrev') . '&pid=' . $post_id;
 
-			/* If no duration is found, output a default message. */
-			if ( empty( $modificacion ) ){
-			
-				$link = admin_url('post-new.php?post_type=c80_cptrev') . '&pid=' . $post_id;
-				echo '<a class="button" href="' . esc_url($link) . '">Añadir Modificacion</a>';
+			/* Si no hay modificación. */
+			if ( !empty( $modificacion ) ){
 
-			/* If there is a duration, append 'minutes' to the text string. */
-			} else {
 				$link = get_edit_post_link( $modificacion );
-				echo '<a class="button-primary" href="' . $link . '">Editar Modificacion</a>';
+				echo '<a class="button-primary" href="' . $link . '">Editar Modificacion</a> ';
+				echo '<a href="' . esc_url($newlink) . '" class="button">Añadir Modificación</a> ';
+				
+
+			/* Si hay modificación. */
+			} else {
+				
+				echo '<a class="button" href="' . esc_url($newlink) . '">Añadir Modificacion</a>';
+
 			}
 
 			break;

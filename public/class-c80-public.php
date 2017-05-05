@@ -236,6 +236,22 @@ class c80_Public {
 			return $isnew;
 		}
 
+		public static function c80_hascontent( $postid ) {
+			/**
+			 * Chequea si tiene contenido tipo parrafos
+			 *
+			 * @param [type] $id
+			 * @return void
+			 */
+			$hascontent = get_post_meta($postid, 'c80_parrafo', true);
+
+			if($hascontent) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 		public function c80_rest_content( $id ) {
 		
 		/**
