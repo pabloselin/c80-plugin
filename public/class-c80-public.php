@@ -119,15 +119,16 @@ class c80_Public {
 		
 				$content = '';
 				$artmods = $this->c80_checkmod($post->ID);
-		
-				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $post->ID );
+				$postid = ($artmods)? $artmods : $post->ID;
+				xdebug_break();
+				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
 
 					foreach(  $parrafos as $key=>$parrafo ) {
 						$extraclasses = '';
 						//Si tiene modificación tomo el primer post y lo muestro
-						$postid = ($artmods)? $artmods : $post->ID;
+						
 
-						$relids = $this->c80_relp( $this->c80_pid( $key, $post->ID ) );
+						$relids = $this->c80_relp( $this->c80_pid( $key, $postid ) );
 						
 						if($relids != 0) {
 							$relids = implode($relids, ', ');
@@ -139,9 +140,9 @@ class c80_Public {
 						//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
 						//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
 
-						$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($post->ID, $key) .'" name="'. $this->c80_name($post->ID, $key) .'" data-pid="'. $this->c80_pid($key, $post->ID) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($post->ID, $key) . '"><p>' . $parrafo . '</p></a>';
+						$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($postid, $key) .'" name="'. $this->c80_name($postid, $key) .'" data-pid="'. $this->c80_pid($key, $postid) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($postid, $key) . '"><p>' . $parrafo . '</p></a>';
 						if($afterp == true) {
-							$content .= $this->c80_afterp( $post->ID, $key );
+							$content .= $this->c80_afterp( $postid, $key );
 						}
 					}
 		
