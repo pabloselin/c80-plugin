@@ -120,7 +120,6 @@ class c80_Public {
 				$content = '';
 				$artmods = $this->c80_checkmod($post->ID);
 				$postid = ($artmods)? $artmods : $post->ID;
-				xdebug_break();
 				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
 
 					foreach(  $parrafos as $key=>$parrafo ) {
