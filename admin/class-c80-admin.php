@@ -457,7 +457,8 @@ class c80_Admin {
 					
 					$checkmod = c80_Public::c80_checkmod($prearticulo->ID);	
 					if($checkmod) {
-						$articulos[$checkmod] = get_the_title($checkmod) . ' [MOD]';
+						$firstmod = $checkmod[0];
+						$articulos[$firstmod] = get_the_title($firstmod) . ' [MOD]';
 					}
 				}
 			}
@@ -495,6 +496,12 @@ class c80_Admin {
 				'context'=> 'normal',
 				'priority' => 'high',
 				'fields' => array(
+					array(
+						'name' => 'Norma',
+						'desc' => 'Norma o Ley',
+						'id' => $prefix . '_modnorma',
+						'type' => 'text'
+						),
 					array(
 						'name' => 'Título',
 						'desc' => 'Título o indicador de la modificacion',

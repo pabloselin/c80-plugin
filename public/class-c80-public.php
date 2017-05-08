@@ -119,7 +119,7 @@ class c80_Public {
 		
 				$content = '';
 				$artmods = $this->c80_checkmod($post->ID);
-				$postid = ($artmods)? $artmods : $post->ID;
+				$postid = ($artmods)? $artmods[0] : $post->ID;
 				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
 
 					foreach(  $parrafos as $key=>$parrafo ) {
@@ -168,7 +168,7 @@ class c80_Public {
 			
 			if($checkmod) {
 				$oldcontent = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
-				$newcontent = rwmb_meta('c80_parrafo', 'multiple=true', $checkmod);
+				$newcontent = rwmb_meta('c80_parrafo', 'multiple=true', $checkmod[0]);
 
 				$oldcontentps = array();
 				$newcontentps = array();
@@ -205,6 +205,8 @@ class c80_Public {
 				$searchargs = array(
 					'post_type' => 'c80_cptrev',
 					'numberposts' => -1,
+					'orderby' => 'post_date',
+					'order' => 'DESC'
 				);
 
 				$searchargs['meta_query'] = array(
@@ -217,7 +219,11 @@ class c80_Public {
 				$artmods = get_posts($searchargs);
 
 				if($artmods):
-					return $artmods[0]->ID;
+					$modids = array();
+					foreach($artmods as $artmod) {
+						$modids[] = $artmod->ID;
+					}
+					return $modids;
 				else:
 					return false;
 				endif;
@@ -580,7 +586,7 @@ class c80_Public {
 		//Chequea si hay un modificador
 		$modid = $this->c80_checkmod($postid);
 		if($modid) {
-			return 'mod-' . $key . '-' . $modid;
+			return 'mod-' . $key . '-' . $modid[0];
 		} else {
 			return $key . '-' . $postid;
 		}
