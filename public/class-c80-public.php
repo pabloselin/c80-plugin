@@ -113,7 +113,7 @@ class c80_Public {
 		
 		if($post_type == 'c80_cpt' && class_exists('RW_Meta_Box')) {
 		
-			if(rwmb_meta( 'c80_parrafo', $post->ID )) {
+			if(rwmb_meta( 'c80_parrafo', $post->ID ) && !get_post_meta($post->ID, 'c80_artderogated', true)) {
 		
 				//Reemplazo la variable de contenido
 		
@@ -146,6 +146,10 @@ class c80_Public {
 					}
 		
 		
+			} elseif(get_post_meta($post->ID, 'c80_artderogated', true)) {
+				
+				$content = '<p class="derogado">Derogado</p>';
+
 			}
 		
 		}
