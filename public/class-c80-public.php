@@ -536,7 +536,13 @@ class c80_Public {
 	 * @since    1.0.0
 	 */	
 	public function c80_permalink( $postid, $key ) {
-		return get_permalink($postid) . '#parrafo-' . $this->c80_pid($key, $postid);
+		if(get_post_type($postid) == 'c80_cptrev') {
+			$origartic = get_post_meta($postid, 'c80_artselect', true);
+			return get_permalink($origartic) . '#parrafo-' . $this->c80_pid($key, $postid);
+		} else {
+			return get_permalink($postid) . '#parrafo-' . $this->c80_pid($key, $postid);
+		}
+		
 	}
 
 	/**
