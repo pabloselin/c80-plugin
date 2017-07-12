@@ -96,7 +96,7 @@ class c80_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->c80, plugin_dir_url( __FILE__ ) . 'js/c80-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->c80, plugin_dir_url( __FILE__ ) . 'js/c80-public.js#asyncload', array( 'jquery' ), $this->version, false );
 
 	}
 
@@ -203,6 +203,11 @@ class c80_Public {
 			 * @return string postid
 			 */
 
+			 if(get_post_meta($postid, '_c80_modids', true)):
+			 	$modids = get_post_meta($postid, '_c80_modids', false);
+				 xdebug_break();
+			 	return $modids;
+			 else:
 				/**
 				 * Aquí hay que buscar cuales si el artículo contiene alguna modificación o versión posterior
 				 */
@@ -226,11 +231,13 @@ class c80_Public {
 					$modids = array();
 					foreach($artmods as $artmod) {
 						$modids[] = $artmod->ID;
+						add_post_meta( $postid, '_c80_modids', $artmod->ID );
 					}
 					return $modids;
 				else:
 					return false;
 				endif;
+			endif;
 		}
 
 		public static function c80_checknew( $postid ) {
