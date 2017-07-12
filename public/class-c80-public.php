@@ -205,7 +205,7 @@ class c80_Public {
 
 			 if(get_post_meta($postid, '_c80_modids', true)):
 			 	$modids = get_post_meta($postid, '_c80_modids', false);
-				 xdebug_break();
+				 //xdebug_break();
 			 	return $modids;
 			 else:
 				/**
