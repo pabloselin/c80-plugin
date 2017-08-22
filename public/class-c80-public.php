@@ -126,8 +126,8 @@ class c80_Public {
 						$extraclasses = '';
 						//Si tiene modificación tomo el primer post y lo muestro
 						
-
-						$relids = $this->c80_relp( $this->c80_pid( $key, $postid ) );
+						$relids = 0;
+						//$relids = $this->c80_relp( $this->c80_pid( $key, $postid ) );
 						
 						if($relids != 0) {
 							$relids = implode($relids, ', ');
@@ -203,7 +203,7 @@ class c80_Public {
 			 * @return string postid
 			 */
 
-			 if(get_post_meta($postid, '_c80_modids', true)):
+			 if(get_post_meta($postid, '_c80_hasartmods', true) == true):
 			 	$modids = get_post_meta($postid, '_c80_modids', false);
 				 //xdebug_break();
 			 	return $modids;
@@ -235,7 +235,7 @@ class c80_Public {
 					}
 					return $modids;
 				else:
-					return false;
+						return false;
 				endif;
 			endif;
 		}
@@ -627,8 +627,8 @@ class c80_Public {
 	 */
 	public function c80_relp( $parid ) {
 		$args = array(
-			'post_type' => 'any',
-			'numberposts' => 100,
+			'post_type' => 'post',
+			'numberposts' => -1,
 			'meta_query' => array(
 				array(
 					'key' => 'c80_parraforel',
@@ -656,8 +656,8 @@ class c80_Public {
 	 */
 	public function c80_relart( $artid ) {
 		$args = array(
-			'post_type' => 'any',
-			'numberposts' => 100,
+			'post_type' => 'post',
+			'numberposts' => -1,
 			'meta_query' => array(
 				array(
 					'key' => 'c80_artrel',
