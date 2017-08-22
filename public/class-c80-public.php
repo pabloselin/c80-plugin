@@ -119,6 +119,9 @@ class c80_Public {
 		
 				$content = '';
 				$artmods = $this->c80_checkmod($post->ID);
+				if($artmods) {
+					$artmods = explode(',', $artmods);
+				}
 				$postid = ($artmods)? $artmods[0] : $post->ID;
 				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
 
@@ -138,8 +141,8 @@ class c80_Public {
 						}
 						//El ID de cada párrafo es una suma del ID del post más el orden en los campos personalizados
 						//Con eso podemos buscar contenidos relacionados en base al ID del párrafo
-
-						$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($postid, $key) .'" name="'. $this->c80_name($postid, $key) .'" data-pid="'. $this->c80_pid($key, $postid) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($postid, $key) . '"><p>' . $parrafo . '</p></a>';
+						//xdebug_break();
+						$content .= '<a class="c80_p ' . $extraclasses . '" href="#" id="'. $this->c80_name($postid, $key) .'" name="'. $this->c80_name($postid, $key) .'" data-pid="'. $this->c80_pid($key, $postid, $artmods) . '" data-order="' . $key . '" ' . $relids . '" data-link="' . $this->c80_permalink($postid, $key) . '"><p>' . $parrafo . '</p></a>';
 						if($afterp == true) {
 							$content .= $this->c80_afterp( $postid, $key );
 						}
@@ -204,8 +207,7 @@ class c80_Public {
 			 */
 
 			 if(get_post_meta($postid, '_c80_modids', true)):
-			 	$modids = get_post_meta($postid, '_c80_modids', false);
-				 //xdebug_break();
+			 	$modids = get_post_meta($postid, '_c80_modids', true);
 			 	return $modids;
 			 else:
 				/**
@@ -231,11 +233,12 @@ class c80_Public {
 					$modids = array();
 					foreach($artmods as $artmod) {
 						$modids[] = $artmod->ID;
-						add_post_meta( $postid, '_c80_modids', $artmod->ID );
 					}
+					$modids = implode(',', $modids);
+					update_post_meta( $postid, '_c80_modids', $modids );
 					return $modids;
 				else:
-						return false;
+					return false;
 				endif;
 			endif;
 		}
@@ -600,9 +603,8 @@ class c80_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function c80_pid( $key, $postid ) {
+	public function c80_pid( $key, $postid, $modid = null ) {
 		//Chequea si hay un modificador
-		$modid = $this->c80_checkmod($postid);
 		if($modid) {
 			return 'mod-' . $key . '-' . $modid[0];
 		} else {
