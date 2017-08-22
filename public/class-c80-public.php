@@ -203,7 +203,7 @@ class c80_Public {
 			 * @return string postid
 			 */
 
-			 if(get_post_meta($postid, '_c80_hasartmods', true) == true):
+			 if(get_post_meta($postid, '_c80_modids', true)):
 			 	$modids = get_post_meta($postid, '_c80_modids', false);
 				 //xdebug_break();
 			 	return $modids;
@@ -294,7 +294,8 @@ class c80_Public {
 				foreach(  $parrafos as $key=>$parrafo ) {
 					$extraclasses = '';
 					
-					$relids = $this->c80_relp( $this->c80_pid( $key, $id ) );
+					//$relids = $this->c80_relp( $this->c80_pid( $key, $id ) );
+					$relids = 0;
 					
 					if($relids != 0) {
 						$relids = implode($relids, ', ');
