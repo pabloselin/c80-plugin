@@ -16,7 +16,7 @@
  * Plugin Name:       C80
  * Plugin URI:        http://apie.cl
  * Description:       Plugin de funciones para aplicación de Constitución
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            A Pie
  * Author URI:        http://apie.cl/
  * License:           GPL-2.0+
