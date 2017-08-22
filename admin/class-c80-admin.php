@@ -457,7 +457,7 @@ class c80_Admin {
 					
 					$checkmod = c80_Public::c80_checkmod($prearticulo->ID);	
 					if($checkmod) {
-						$firstmod = $checkmod;
+						$firstmod = $checkmod[0];
 						$articulos[$firstmod] = get_the_title($firstmod) . ' [MOD]';
 					}
 				}

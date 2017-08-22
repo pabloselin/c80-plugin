@@ -119,9 +119,6 @@ class c80_Public {
 		
 				$content = '';
 				$artmods = $this->c80_checkmod($post->ID);
-				if($artmods) {
-					$artmods = explode(',', $artmods);
-				}
 				$postid = ($artmods)? $artmods[0] : $post->ID;
 				$parrafos = rwmb_meta('c80_parrafo', 'multiple=true', $postid );
 
@@ -208,7 +205,7 @@ class c80_Public {
 
 			 if(get_post_meta($postid, '_c80_modids', true)):
 			 	$modids = get_post_meta($postid, '_c80_modids', true);
-			 	return $modids;
+			 	return explode(',', $modids);
 			 else:
 				/**
 				 * Aquí hay que buscar cuales si el artículo contiene alguna modificación o versión posterior
@@ -236,7 +233,7 @@ class c80_Public {
 					}
 					$modids = implode(',', $modids);
 					update_post_meta( $postid, '_c80_modids', $modids );
-					return $modids;
+					return explode(',', $modids);
 				else:
 					return false;
 				endif;
