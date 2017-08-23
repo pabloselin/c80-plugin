@@ -96,7 +96,7 @@ class c80_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->c80, plugin_dir_url( __FILE__ ) . 'js/c80-public.js#asyncload', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->c80, plugin_dir_url( __FILE__ ) . 'js/c80-public.js#asyncload', array( 'jquery' ), $this->version, true );
 
 	}
 

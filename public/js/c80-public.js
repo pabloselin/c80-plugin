@@ -30,11 +30,8 @@
 	 */
 
 	 var hash = window.location.hash;
-	 $( window ).load(function() {
-	 	console.log(hash);
 	 	if(hash.length > 0) {
 	 		$('a' + hash).addClass('highlight');	
 	 	}
-	 });
 
 })( jQuery );
