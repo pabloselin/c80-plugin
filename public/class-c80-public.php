@@ -73,7 +73,7 @@ class c80_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->c80, plugin_dir_url( __FILE__ ) . 'css/c80-public.css', array(), $this->version, 'all' );
+		//wp_enqueue_style( $this->c80, plugin_dir_url( __FILE__ ) . 'css/c80-public.css', array(), $this->version, 'all' );
 
 	}
 
