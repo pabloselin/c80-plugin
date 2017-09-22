@@ -656,7 +656,7 @@ class c80_Public {
 	 */
 	public function c80_relart( $artid ) {
 		$args = array(
-			'post_type' => 'post',
+			'post_type' => array('post', 'columnas'),
 			'numberposts' => -1,
 			'meta_query' => array(
 				array(
