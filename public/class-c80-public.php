@@ -371,7 +371,7 @@ class c80_Public {
 	public function c80_jsonget( WP_REST_Request $request ) {
 
 		$capno = $request['id'];
-		$artno = $request['articulokey'];	
+		$artno = $request['articulokey'];
 
 		//Construyo el objeto capítulo
 		
@@ -450,7 +450,6 @@ class c80_Public {
 			$articulo['contenido'] = rwmb_meta('c80_parrafo', 'multiple=true', $articulo_item->ID );
 
 			return $articulo;
-
 		} else {
 
 			$error = array(
@@ -464,6 +463,83 @@ class c80_Public {
 			return $error;
 		}
 
+	}
+
+	public function c80_full( WP_REST_Request $request ) {
+		// Devuelve toda la constitucion
+		$args = array(
+			'post_type' 	=> 'c80_cpt',
+			'numberposts'	=> -1,
+			'post_parent'	=> 0,
+			'orderby'		=> 'menu_order',
+			'order'			=> 'ASC'
+		);
+
+		$chapters = get_posts($args);
+		$constitucion = array();
+
+		foreach( $chapters as $chapter) {
+			$constitucion['contenido'][$chapter->post_name] = array(
+				'titulo' 	=> $chapter->post_title,
+				'subtitulo'	=> get_post_meta($chapter->ID, 'c80_subtartcap', true)
+			);
+
+			$args = array(
+				'post_type' 	=> 'c80_cpt',
+				'post_parent' 	=> $chapter->ID,
+				'numberposts' 	=> -1,
+				'orderby'		=> 'menu_order',
+				'order'			=> 'ASC'
+				);
+
+			$articulos = get_posts($args);
+
+			foreach( $articulos as $key=> $articulo ) {
+
+				$contenido = rwmb_meta('c80_parrafo', 'multiple=true', $articulo->ID );
+
+				$subargs = array(
+					'post_type' => 'c80_cpt',
+					'numberposts' => -1,
+					'post_parent' => $articulo->ID,
+					'orderby' => 'menu_order',
+					'order' => 'ASC'
+					);
+
+				$subarticulos = get_posts($subargs);
+
+				if($subarticulos) {
+
+
+					foreach($subarticulos as $subarticulo) {
+
+						$subcontenido = rwmb_meta('c80_parrafo', 'multiple=true', $subarticulo->ID );
+						$subarticulos_filtrado[] = array(
+							'title' => $subarticulo->post_title,
+							'contenido' => $subcontenido
+							);
+
+					}
+
+					$constitucion['contenido'][$chapter->post_name]['articulos'][$key] = array(
+						'seccion' => $articulo->post_title,
+						'articulos' => $subarticulos_filtrado
+						);
+				} else {
+
+					$constitucion['contenido'][$chapter->post_name]['articulos'][$key] = array(
+						'titulo'	=> $articulo->post_title,
+						'contenido'	=> $contenido
+					);
+
+				}
+
+			}
+
+		}
+
+
+		return $constitucion;
 	}
 
 	public function c80_getchapter_bymeta( $chapter ) {
@@ -534,6 +610,12 @@ class c80_Public {
 						}
 					)
 				)
+			)
+		);
+
+		register_rest_route('constitucion1980/v1/', '/constitucion/', array(
+			'methods' => 'GET',
+			'callback' => array( $this, 'c80_full' )
 			)
 		);
 	}
