@@ -542,6 +542,73 @@ class c80_Public {
 		return $constitucion;
 	}
 
+	/*
+	* Devuelve los endpoints nombres y titulos de los articulos por separado
+	*
+	*/
+
+	public function c80_articles() {
+		$args = array(
+			'post_type' 	=> 'c80_cpt',
+			'numberposts'	=> -1,
+			'orderby'		=> 'menu_order',
+			'order'			=> 'ASC',
+			'meta_key'		=> 'c80_artno'
+		);
+
+		$articulos_data = array();
+		$articulos = get_posts($args);
+
+		foreach($articulos as $articulo) {
+			if($articulo->post_parent !== 0) {
+				$articulo_no = get_post_meta($articulo->ID, 'c80_artno', true);
+				$articulos_data[] = array(
+										'titulo' 	=> $articulo->post_title,
+										'numero'	=> $articulo_no,
+										'wpid'		=> $articulo->ID,
+										'endpoint'	=> get_rest_url() . 'constitucion1980/v1/articulo/' . $articulo_no
+									);	
+			}
+			
+		}
+
+		return $articulos_data;
+
+
+
+	}
+
+	public function c80_chapters() {
+		$args = array(
+			'post_type' 	=> 'c80_cpt',
+			'numberposts'	=> -1,
+			'orderby'		=> 'menu_order',
+			'order'			=> 'ASC',
+			'meta_key'		=> 'c80_capno'
+		);
+
+		$capitulos_data = array();
+		$capitulos = get_posts($args);
+
+		foreach($capitulos as $capitulo) {
+			if($capitulo->post_parent == 0) {
+				$capitulo_no = get_post_meta($capitulo->ID, 'c80_capno', true);
+				$capitulos_data[] = array(
+										'titulo' 	=> $capitulo->post_title,
+										'numero'	=> $capitulo_no,
+										'wpid'		=> $capitulo->ID,
+										'endpoint'	=> get_rest_url() . 'constitucion1980/v1/capitulo/' . $capitulo_no
+									);	
+			}
+			
+		}
+
+		return $capitulos_data;
+
+
+
+	}
+
 	public function c80_getchapter_bymeta( $chapter ) {
 
 		$args = array(
@@ -610,6 +677,19 @@ class c80_Public {
 						}
 					)
 				)
+			)
+		);
+
+		register_rest_route('constitucion1980/v1/', '/articulos/', array(
+			'methods' => 'GET',
+			'callback' => array( $this, 'c80_articles' )
+			)
+		);
+
+
+		register_rest_route('constitucion1980/v1/', '/capitulos/', array(
+			'methods' => 'GET',
+			'callback' => array( $this, 'c80_chapters' )
 			)
 		);
 
